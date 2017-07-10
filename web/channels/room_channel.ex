@@ -1,5 +1,6 @@
 defmodule ChatServer.RoomChannel do
   use Phoenix.Channel
+  require Logger
 
   @initial_posts ["post1", "post2"]
 
@@ -12,14 +13,41 @@ defmodule ChatServer.RoomChannel do
   end
 
   def handle_info(:after_join, socket) do
-    push socket, "new_posts", %{value: @initial_posts}
+    messages = get_room_messages(socket.topic);
+
+    push_messages(messages, socket)
 
     {:noreply, socket}
   end
 
   def handle_in("new:msg", msg, socket) do
-    push socket, "new_posts", %{value: @initial_posts ++ msg}
+
+    messages = add_room_message(socket.topic, msg)
+
+    push_messages(messages, socket)
 
     {:noreply, socket}
+  end
+
+  def get_room_messages(room) do
+    messages = case res = ChatServer.Store.fetch(room) do
+      [msg|_tail] -> res
+      _ ->
+        # create the messages for the room
+        initial_messages = []
+        ChatServer.Store.set(room, initial_messages)
+        initial_messages
+    end
+  end
+
+  def add_room_message(room, msg) do
+    new_messages = get_room_messages(room) ++ [msg]
+    ChatServer.Store.set(room, new_messages)
+    new_messages
+  end
+
+  def push_messages(messages, socket) do
+    Logger.warn("pushing messages #{inspect messages}")
+    push socket, "new_messages", %{value: messages |> Enum.take(-10)}
   end
 end

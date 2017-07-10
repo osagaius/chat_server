@@ -13,7 +13,7 @@ defmodule ChatServer do
       # Start the endpoint when the application starts
       supervisor(ChatServer.Endpoint, []),
       # Start your own worker by calling: ChatServer.Worker.start_link(arg1, arg2, arg3)
-      # worker(ChatServer.Worker, [arg1, arg2, arg3]),
+      worker(ChatServer.Store, []),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
