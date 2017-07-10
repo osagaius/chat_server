@@ -21,6 +21,9 @@ defmodule ChatServer.RoomChannel do
   end
 
   def handle_in("new:msg", msg, socket) do
+    msg = msg
+    |> Map.put("timestamp", :os.system_time(:seconds))
+    |> Map.put("id", UUID.uuid1())
 
     messages = add_room_message(socket.topic, msg)
 
