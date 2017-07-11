@@ -3,6 +3,7 @@ defmodule ChatServer.RoomChannel do
   require Logger
 
   def join("room:lobby", _params, socket) do
+    send self(), :after_join
     {:ok, socket}
   end
   def join("room:" <> room_id, _params, socket) do
@@ -56,7 +57,16 @@ defmodule ChatServer.RoomChannel do
   defp add_room(room) do
     key = "rooms_list"
     rooms = get_rooms()
-    ChatServer.Store.set(key, rooms ++ [room])
+
+    case rooms |> Enum.any?(&(&1.name == room)) do
+      true ->
+        # Do nothing since the room already exists
+        # TODO return error instead
+        nil
+      false ->
+        ChatServer.Store.set(key, rooms ++ [%{ name: room}])
+    end
+
   end
 
   def get_rooms() do
