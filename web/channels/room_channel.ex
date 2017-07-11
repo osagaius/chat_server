@@ -51,6 +51,6 @@ defmodule ChatServer.RoomChannel do
 
   def push_messages(messages, socket) do
     Logger.warn("pushing messages #{inspect messages}")
-    push socket, "new_messages", %{value: messages |> Enum.take(-10)}
+    broadcast socket, "new_messages", %{value: messages |> Enum.take(-10)}
   end
 end
