@@ -14,6 +14,7 @@ defmodule ChatServer do
       supervisor(ChatServer.Endpoint, []),
       # Start your own worker by calling: ChatServer.Worker.start_link(arg1, arg2, arg3)
       worker(ChatServer.Store, []),
+      supervisor(ChatServer.Presence, []),
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

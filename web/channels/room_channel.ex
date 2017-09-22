@@ -18,6 +18,12 @@ defmodule ChatServer.RoomChannel do
     messages = get_room_messages(socket.topic);
     push_messages(messages, socket)
 
+    ChatServer.Presence.track(socket, socket.assigns.current_user, %{
+      user: socket.assigns.current_user
+    })
+
+    push(socket, "presence_state", ChatServer.Presence.list(socket))
+
     {:noreply, socket}
   end
 
